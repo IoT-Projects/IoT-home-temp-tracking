@@ -1,0 +1,97 @@
+<!DOCTYPE html>
+<html>
+    <head>
+        <meta charset="utf-8">
+        <title>Add Device</title>
+        <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.5/css/bootstrap.min.css" integrity="sha512-dTfge/zgoMYpP7QbHy4gWMEGsbsdZeCXz7irItjcC3sPUFtf0kuFbDz/ixG7ArTxmDjLXDmezHubeNikyKGVyQ==" crossorigin="anonymous">
+        <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.5/css/bootstrap-theme.min.css" integrity="sha384-aUGj/X2zp5rLCbBxumKTCw2Z50WgIr1vs/PFN4praOTvYXWlVyh2UtNUU0KAUhAX" crossorigin="anonymous">
+        <style>
+            body {
+              padding-top: 40px;
+              padding-bottom: 40px;
+              background-color: #eee;
+            }
+
+            .form-signin {
+              max-width: 360px;
+              padding: 15px;
+              margin: 0 auto;
+            }
+
+            .form-signin .form-signin-heading {
+              margin-bottom: 10px;
+            }
+
+
+            .form-signin .form-control {
+              position: relative;
+              height: auto;
+              -webkit-box-sizing: border-box;
+                 -moz-box-sizing: border-box;
+                      box-sizing: border-box;
+              padding: 10px;
+              font-size: 16px;
+            }
+
+            .form-signin .form-control:focus {
+              z-index: 2;
+            }
+            [data-toggle="hide"] {
+                display: none;
+            }
+            [data-toggle="show"] {
+                display: block;
+            }
+        </style>
+    </head>
+    <body>
+        <form class="form-signin">
+            <div class="alert alert-success" data-toggle="hide" role="alert"> <strong>Well done! </strong> <span class="js-success"></span></div>
+            <div class="alert alert-danger" data-toggle="hide" role="alert"> <strong>Oh snap! </strong> <span class="js-error"></span></div>
+            <h2 class="form-signin-heading">Add New Device</h2>
+            <label htmlFor="inputEmail" class="sr-only">"Device name/ location</label>
+            <input type="text" name="location" id="inputEmail" class="form-control" placeholder="Device name/ location" required autofocus/>
+            <label htmlFor="ipaddress" class="sr-only">IPv4 address</label>
+            <input type="text" id="ipaddress" name="ip" class="form-control" placeholder="IPv4 address" required pattern="^(\d|[1-9]\d|1\d\d|2([0-4]\d|5[0-5]))\.(\d|[1-9]\d|1\d\d|2([0-4]\d|5[0-5]))\.(\d|[1-9]\d|1\d\d|2([0-4]\d|5[0-5]))\.(\d|[1-9]\d|1\d\d|2([0-4]\d|5[0-5]))$">
+            <button class="btn btn-lg btn-primary btn-block" type="submit">Add Device</button>
+            <a href="index.php/install">Install script</a>
+        </form>
+        <script>
+            var form = document.querySelector('.form-signin');
+            function addDevice(e) {
+                e.preventDefault();
+                var target = e.target;
+                var params = getParams(target);
+                fetch('./index.php/add?location=' + params[0] + '&ip=' + params[1]).then(function(response) {
+                    return response.json();
+                }).then(function(j) {
+                    if(j.error) {
+                        var errorDiv = document.querySelector('.alert-danger');
+                        errorDiv.setAttribute('data-toggle', 'show');
+                        errorDiv.querySelector('.js-error').textContent = j.error;
+                    } else {
+                        var successDiv = document.querySelector('.alert-success');
+                        successDiv.setAttribute('data-toggle', 'show');
+                        successDiv.querySelector('.js-success').textContent = 'Device ' + j.location + ' Added, DeviceId is ' + j.deviceID;
+                        target.reset();
+                    }
+                });
+            }
+            function getParams(form) {
+                var formFields = form.querySelectorAll('input');
+                var fieldValues = [];
+                for(var i = 0; i < formFields.length; i++) {
+                    fieldValues.push(formFields[i].value);
+                }
+                return fieldValues;
+            }
+            form.addEventListener('submit', addDevice);
+            form.addEventListener('change', function() {
+                var alerts = document.querySelectorAll('.alert');
+                for(var i = 0; i < alerts.length; i++) {
+                    alerts[i].setAttribute('data-toggle', 'hide');
+                }
+            });
+        </script>
+    </body>
+</html>
