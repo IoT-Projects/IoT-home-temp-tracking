@@ -1,5 +1,4 @@
 <?php
-
 // basic crud for Temp tempTracking
 // tracking is done from device IP
 // Did not build as OOP at this time as I just wanted to get something fast out the door.
@@ -33,6 +32,9 @@ switch($path) {
     case 'install':
         install();
         break;
+    case 'check':
+        device($ip);
+        break;
 }
 
 function connect() {
@@ -45,7 +47,7 @@ function connect() {
 function install() {
     $db = connect();
     $db->exec("CREATE TABLE IF NOT EXISTS Devices (Id INTEGER PRIMARY KEY autoincrement, Location TEXT, IP TEXT UNIQUE)");
-    $db->exec("CREATE TABLE IF NOT EXISTS Temps (Id INTEGER PRIMARY KEY autoincrement, IP TEXT, Temperature REAL, Humidity REAL, Timestamp DATETIME DEFAULT CURRENT_TIMESTAMP)");
+    $db->exec("CREATE TABLE IF NOT EXISTS Temps (Id INTEGER PRIMARY KEY autoincrement, deviceId INTEGER, Temperature REAL, Humidity REAL, Timestamp DATETIME DEFAULT CURRENT_TIMESTAMP)");
     echo 'installed';
 }
 
@@ -79,16 +81,31 @@ function addDevice($ip, $location) {
     }
 }
 
+function device($ip) {
+    print_r(getDeviceId($ip));
+}
+
+function getDeviceId($ip) {
+    $db = connect();
+    $deviceCheckSql = "SELECT Id FROM 'Devices' WHERE IP = '$ip'";
+    $rowCount = $db->query($deviceCheckSql, PDO::FETCH_ASSOC);
+    if($rowCount->fetchColumn() > 0) {
+        foreach ($db->query($deviceCheckSql, PDO::FETCH_ASSOC) as $row) {
+            return $row['Id'];
+        }
+    }
+}
+
 function trackTemp($ip, $temp, $humidity) {
     $db = connect();
 
     if(!checkDevice($ip)) {
         addDevice($ip, 'Unknown');
     }
-
-    $tempSql = "INSERT into Temps (IP, Temperature, Humidity) VALUES (:ip, :temp, :humid)";
+    $deviceId = GetDeviceId($ip);
+    $tempSql = "INSERT into Temps (DeviceId, Temperature, Humidity) VALUES (:deviceId, :temp, :humid)";
     $insert = $db->prepare($tempSql);
-    if($insert->execute(array($ip, $temp, $humidity))) {
+    if($insert->execute(array($deviceId, $temp, $humidity))) {
         echo '{"status": "uploaded"}';
     } else {
         echo '{"error": "failed to track temp"}';
