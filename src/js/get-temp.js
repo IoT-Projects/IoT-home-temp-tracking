@@ -1,7 +1,7 @@
 // Simple node script to pull data and insert like it is a device.
+'use strict';
+var openweatherAPIKey = 'Your Key and not mine';
 
-var openweatherAPIKey = 'ff6f5d189dfa1eba10cc3559a7eb097d'
-// ?zip=94040,us&appid=2de143494c0b295cca9337e1e96b00e0
 var openweatherAPIUrl = 'http://api.openweathermap.org/data/2.5/weather?units=imperial&appid=' + openweatherAPIKey;
 var weathertrackerUrl = 'http://localhost';
 var weathertrackerPort = 8000;
@@ -51,7 +51,7 @@ function init(e) {
     e.preventDefault();
     setInterval(function() {
         getWeather(devices[currentDevice]);
-        currentDevice++
+        currentDevice++;
         if(currentDevice === deviceCount) {
             currentDevice = 0;
         }
