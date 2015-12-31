@@ -22,7 +22,7 @@ void setup() {
   USE_SERIAL.println();
   delay(4000);
 
-  WiFiMulti.addAP("Empire-2.4", "5038038883");
+  WiFiMulti.addAP("ssid", "wifipass");
   Serial.print("Wait for WiFi... ");
   WiFi.macAddress(MAC_array);
   for (int i = 0; i < sizeof(MAC_array); ++i){
