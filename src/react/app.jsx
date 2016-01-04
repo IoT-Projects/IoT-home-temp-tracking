@@ -3,13 +3,10 @@ var React = require('react');
 var Actions = require('../js/lib/actions');
 var Store = require('../js/lib/stores');
 
-var TimeCard = require('./time-card.jsx');
-var Signin = require('./sign-in.jsx');
-
 module.exports = React.createClass({
     getInitialState:function() {
         return {
-            needsSignin: Store.isSignedIn()
+            locations: []
         };
     },
     componentDidMount: function() {
@@ -19,14 +16,15 @@ module.exports = React.createClass({
         this.unsubscribe();
     },
     onChange: function() {
-        this.setState({needsSignin: Store.isSignedIn()});
+        this.setState({
+            locations: Store.getLocations()
+        });
     },
     render: function() {
+        console.log(this.state.locations);
         return (
             <div className="container">
-                {
-                    this.state.needsSignin ? <TimeCard/> : <Signin/>
-                }
+                hello
             </div>
         );
     }

@@ -49,7 +49,6 @@ module.exports = function(grunt) {
         jshint: {
             all: '<%= project.srcJs %>/{,*/}*.js',
             options: {
-                //ignores: ['<%= project.src_js %>/lib/handlebars.js'],
                 jshintrc: '.jshintrc',
                 reporter: require('jshint-stylish'),
             },

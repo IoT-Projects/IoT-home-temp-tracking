@@ -4,12 +4,13 @@ var Reflux = require('reflux');
 var Actions = require('./actions');
 var moment = require('moment');
 
-var _info = [];
+var _locations = [];
 
 module.exports = Reflux.createStore({
     init: function() {
         this.listenTo(Actions.ClockIn, this.onCreate);
         this.listenTo(Actions.ClockOut, this.onEdit);
+        this.getLocationsData();
     },
     // called on save
     onCreate: function(info) {
@@ -38,25 +39,17 @@ module.exports = Reflux.createStore({
             self.trigger(j);
         });
     },
-    isSignedIn: function() {
-        if(localStorage.timeTracker) {
-            return true;
-        } else {
-            return false;
-        }
-
-    },
-    create: function() {
-
+    getLocations: function() {
+        return _locations;
     },
     // called on load from jsx template
-    getTimes: function() {
-        var userId = this.getUserInfo().Id;
-        fetch('/crud.php/times?userId=' + userId).then(function(response) {
+    getLocationsData: function() {
+        var self = this;
+        fetch('/api.php/list/locations').then(function(response) {
             return response.json();
         }).then(function(j) {
-            _info = j;
-            return j;
+            _locations = j;
+            self.trigger();
         });
     },
     signOut: function() {
