@@ -7,15 +7,16 @@
 ini_set('error_reporting', 'E_ALL & ~E_NOTICE');
 
 $path = substr($_SERVER['PATH_INFO'], 1);
-$sourceIp = $_SERVER['REMOTE_ADDR'];
-$ip = isset($_GET['ip']) ? $_GET['ip'] : $sourceIp;
+$sourceIp = $_SERVER['REMOTE_ADDR']; // source the IP if ip is not set.
+$ip = isset($_GET['ip']) ? $_GET['ip'] : $sourceIp; // ip can be an IP address, MAC address or anything.
+$voltage = isset($_GET['v']) ? $_GET['v'] : null; // just an empty string if not set
 $location = $_GET['location'];
 $temp = $_GET['t'];
 $humidity = $_GET['h'];
 
 switch($path) {
     case 'track':
-        trackTemp($ip, $temp, $humidity);
+        trackTemp($ip, $temp, $humidity, $voltage);
         break;
     case 'list/locations':
         getAllLocations();
@@ -47,7 +48,7 @@ function connect() {
 function install() {
     $db = connect();
     $db->exec("CREATE TABLE IF NOT EXISTS Devices (Id INTEGER PRIMARY KEY autoincrement, Location TEXT, IP TEXT UNIQUE)");
-    $db->exec("CREATE TABLE IF NOT EXISTS Temps (Id INTEGER PRIMARY KEY autoincrement, deviceId INTEGER, Temperature REAL, Humidity REAL, Timestamp DATETIME DEFAULT CURRENT_TIMESTAMP)");
+    $db->exec("CREATE TABLE IF NOT EXISTS Temps (Id INTEGER PRIMARY KEY autoincrement, deviceId INTEGER, Temperature REAL, Humidity REAL, Voltage REAL, Timestamp DATETIME DEFAULT CURRENT_TIMESTAMP)");
     echo 'installed';
 }
 
@@ -96,16 +97,16 @@ function getDeviceId($ip) {
     }
 }
 
-function trackTemp($ip, $temp, $humidity) {
+function trackTemp($ip, $temp, $humidity, $voltage) {
     $db = connect();
 
     if(!checkDevice($ip)) {
         addDevice($ip, 'Unknown');
     }
     $deviceId = GetDeviceId($ip);
-    $tempSql = "INSERT into Temps (DeviceId, Temperature, Humidity) VALUES (:deviceId, :temp, :humid)";
+    $tempSql = "INSERT into Temps (DeviceId, Temperature, Humidity, Voltage) VALUES (:deviceId, :temp, :humid, :voltage)";
     $insert = $db->prepare($tempSql);
-    if($insert->execute(array($deviceId, $temp, $humidity))) {
+    if($insert->execute(array($deviceId, $temp, $humidity, $voltage))) {
         echo '{"status": "uploaded"}';
     } else {
         echo '{"error": "failed to track temp"}';
