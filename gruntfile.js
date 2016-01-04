@@ -40,8 +40,10 @@ module.exports = function(grunt) {
         },
         copy: {
             main: {
-                src: '<%= project.src %>/index.html',
-                dest: './index.html',
+                expand: true,
+                src: '<%= project.src %>/*.{html,php}',
+                dest: '<%= project.app %>/',
+                flatten: true,
             },
         },
         jshint: {
@@ -95,7 +97,7 @@ module.exports = function(grunt) {
                 tasks: ['browserify:dist']
             },
             copy: {
-                files: '<%= project.src %>/index.html',
+                files: '<%= project.src %>/*.{html,php}',
                 tasks: ['copy']
             },
             less: {
@@ -129,7 +131,7 @@ module.exports = function(grunt) {
         },
     });
 
-    require('matchdep').filter('grunt-*').forEach(grunt.loadNpmTasks);
+    require('matchdep').filterAll('grunt-*').forEach(grunt.loadNpmTasks);
 
     grunt.registerTask('js', ['jshint', 'browserify:dist']);
     grunt.registerTask('css', ['less']);
