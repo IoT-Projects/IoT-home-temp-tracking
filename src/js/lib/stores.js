@@ -70,7 +70,7 @@ module.exports = Reflux.createStore({
         fetch('/crud.php/time/track?userId=' + userId + '&time=' + clockTime).then(function(response) {
             return response.json();
         }).then(function(j) {
-            _info = j;
+            //_info = j;
             self.trigger();
         });
     }

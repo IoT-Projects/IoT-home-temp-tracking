@@ -3,6 +3,8 @@ var React = require('react');
 var Actions = require('../js/lib/actions');
 var Store = require('../js/lib/stores');
 
+var Card = require('./card.jsx');
+
 module.exports = React.createClass({
     getInitialState:function() {
         return {
@@ -21,10 +23,14 @@ module.exports = React.createClass({
         });
     },
     render: function() {
-        console.log(this.state.locations);
+        var self = this;
         return (
             <div className="container">
-                hello
+                <div className="navWrapper">
+                    {this.state.locations.map(function(location) {
+                        return <Card key={location.Id} data={location}/>;
+                    })}
+                </div>
             </div>
         );
     }

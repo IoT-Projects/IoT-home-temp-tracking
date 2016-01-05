@@ -5,27 +5,40 @@
 
 // Best to change in the php.ini but wanted to add here for now
 ini_set('error_reporting', 'E_ALL & ~E_NOTICE');
+date_default_timezone_set('America/Los_Angeles'); // list of timezones http://php.net/manual/en/timezones.php
 
 $path = substr($_SERVER['PATH_INFO'], 1);
 $sourceIp = $_SERVER['REMOTE_ADDR']; // source the IP if ip is not set.
 $ip = isset($_GET['ip']) ? $_GET['ip'] : $sourceIp; // ip can be an IP address, MAC address or anything.
-$voltage = isset($_GET['v']) ? $_GET['v'] : null; // just an empty string if not set
+$voltage = isset($_GET['v']) ? $_GET['v'] : null;
 $location = $_GET['location'];
 $temp = $_GET['t'];
 $humidity = $_GET['h'];
+$startDate = $_GET['sd'];
+$endDate = $_GET['ed'];
 
 switch($path) {
     case 'track':
         trackTemp($ip, $temp, $humidity, $voltage);
         break;
     case 'list/locations':
-        getAllLocations();
+        echo json_encode(getAllLocations());
         break;
     case 'list/temps':
-        getLocationTemps($ip);
+        echo json_encode(getLocationTemps($ip));
         break;
     case 'list/all-temps':
-        getAllTemps();
+        echo json_encode(getAllTemps());
+        break;
+    case 'list/today':
+        $date = new DateTime('NOW');
+        $startDate = $date->format('Y-m-d');
+        $date->modify('+1 day');
+        $endDate = $date->format('Y-m-d');
+        echo json_encode(getLocationByDate($ip, $startDate, $endDate));
+        break;
+    case 'list/dates':
+        echo json_encode(getLocationByDate($ip, $startDate, $endDate));
         break;
     case 'add':
         addDevice($ip, $location);
@@ -115,31 +128,68 @@ function trackTemp($ip, $temp, $humidity, $voltage) {
 
 function getAllLocations() {
     $db = connect();
-    $devicesSql = "SELECT * FROM 'Devices'";
+    $devicesSql = "SELECT * FROM 'Devices' INNER JOIN 'Temps' ON Devices.id = Temps.deviceId GROUP BY Devices.id";
     $rowCount = $db->query($devicesSql, PDO::FETCH_ASSOC);
     if($rowCount->fetchColumn() > 0) {
-        $times = [];
+        $rows = [];
         foreach ($db->query($devicesSql, PDO::FETCH_ASSOC) as $row) {
-            $times[] = $row;
+            $rows[] = $row;
         }
-        echo json_encode($times);
+        return $rows;
     } else {
-        echo '[]';
+        return array();
     }
 }
 
-function getLocationTemps($ip) {
+function getLocationLastTemp($ip) {
+    $deviceId = getDeviceId($ip);
     $db = connect();
-    $tempsSql = "SELECT * FROM Temps WHERE IP = '$ip' ORDER BY Timestamp DESC";
+    $tempsSql = "SELECT * FROM Temps WHERE deviceId = '$deviceId' ORDER BY Timestamp DESC LIMIT 0 , 1";
     $rowCount = $db->query($tempsSql, PDO::FETCH_ASSOC);
     if($rowCount->fetchColumn() > 0) {
         $temps = [];
         foreach ($db->query($tempsSql, PDO::FETCH_ASSOC) as $row) {
             $temps[] = $row;
         }
-        echo json_encode($temps);
+        return $temps;
     } else {
-        echo '[]';
+        return array();
+    }
+}
+
+function getLocationToday($ip) {
+
+}
+
+function getLocationByDate($ip, $startDate, $endDate) {
+    $deviceId = getDeviceId($ip);
+    $db = connect();
+    $tempsSql = "SELECT * FROM Temps WHERE deviceId = '$deviceId' AND Timestamp BETWEEN '$startDate' AND '$endDate'  ORDER BY Timestamp DESC";
+    $rowCount = $db->query($tempsSql, PDO::FETCH_ASSOC);
+    if($rowCount->fetchColumn() > 0) {
+        $temps = [];
+        foreach ($db->query($tempsSql, PDO::FETCH_ASSOC) as $row) {
+            $temps[] = $row;
+        }
+        return $temps;
+    } else {
+        return array();
+    }
+}
+
+function getLocationTemps($ip) {
+    $deviceId = getDeviceId($ip);
+    $db = connect();
+    $tempsSql = "SELECT * FROM Temps WHERE deviceId = '$deviceId' ORDER BY Timestamp DESC";
+    $rowCount = $db->query($tempsSql, PDO::FETCH_ASSOC);
+    if($rowCount->fetchColumn() > 0) {
+        $temps = [];
+        foreach ($db->query($tempsSql, PDO::FETCH_ASSOC) as $row) {
+            $temps[] = $row;
+        }
+        return $temps;
+    } else {
+        return array();
     }
 }
 
@@ -152,8 +202,8 @@ function getAllTemps() {
         foreach ($db->query($tempsSql, PDO::FETCH_ASSOC) as $row) {
             $temps[] = $row;
         }
-        echo json_encode($temps);
+        return $temps;
     } else {
-        echo '[]';
+        return array();
     }
 }
