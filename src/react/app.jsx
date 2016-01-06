@@ -4,11 +4,13 @@ var Actions = require('../js/lib/actions');
 var Store = require('../js/lib/stores');
 
 var Card = require('./card.jsx');
+var MainContent = require('./main-content.jsx');
 
 module.exports = React.createClass({
     getInitialState:function() {
         return {
-            locations: []
+            locations: [],
+            location: null
         };
     },
     componentDidMount: function() {
@@ -31,6 +33,7 @@ module.exports = React.createClass({
                         return <Card key={location.Id} data={location}/>;
                     })}
                 </div>
+                {this.state.location ? <MainContent /> : ''}
             </div>
         );
     }
