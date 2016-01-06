@@ -10,7 +10,7 @@ module.exports = React.createClass({
     getInitialState:function() {
         return {
             locations: [],
-            location: null
+            location: []
         };
     },
     componentDidMount: function() {

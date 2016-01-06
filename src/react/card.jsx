@@ -1,6 +1,7 @@
 'use strict';
 var React = require('react');
 var moment = require('moment');
+var Store = require('../js/lib/stores');
 
 module.exports = React.createClass({
     //getInitialState:function() {
@@ -15,14 +16,16 @@ module.exports = React.createClass({
     //    this.unsubscribe();
     //},
     locationSelection: function(e) {
-        console.log('what');
-        //this.props.action.locationSelection(e);
+        e.preventDefault();
+        var target = e.currentTarget;
+        var deviceId = target.getAttribute('data-id');
+        Store.getDataFor(deviceId);
     },
     render: function() {
         console.log(this.props);
         var timestamp = moment(this.props.data.Timestamp).format('MMM D, h:mm:ss a');
         return (
-            <a data-id={this.props.data.Id} href="#" onClick={this.locationSelection} className="card medium">
+            <a data-id={this.props.data.deviceId} href="#" onClick={this.locationSelection} className="card medium">
                 <div className="cardDetails">
                     <span className="locationId">{this.props.data.deviceId}</span>
                     <span className="title">{this.props.data.Location}</span>

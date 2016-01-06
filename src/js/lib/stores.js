@@ -21,23 +21,24 @@ module.exports = Reflux.createStore({
     getUserInfo: function() {
         return JSON.parse(localStorage.timeTracker);
     },
-    signIn: function(name, pin) {
-        var self = this;
-        fetch('/crud.php/login', {
-            method: 'POST',
-            body: JSON.stringify({
-                name: name,
-                pin: pin
-            })
-        }).then(function(response) {
-            return response.json();
-        }).then(function(j) {
-            if(!j.error) {
-                j.signinDate = Date.now();
-                localStorage.timeTracker = JSON.stringify(j);
-            }
-            self.trigger(j);
-        });
+    getDataFor: function(deviceId) {
+        console.log(deviceId);
+        //var self = this;
+        //fetch('/crud.php/login', {
+        //    method: 'POST',
+        //    body: JSON.stringify({
+        //        name: name,
+        //        pin: pin
+        //    })
+        //}).then(function(response) {
+        //    return response.json();
+        //}).then(function(j) {
+        //    if(!j.error) {
+        //        j.signinDate = Date.now();
+        //        localStorage.timeTracker = JSON.stringify(j);
+        //    }
+        //    self.trigger(j);
+        //});
     },
     getLocations: function() {
         return _locations;
