@@ -6,6 +6,12 @@
 // Best to change in the php.ini but wanted to add here for now
 ini_set('error_reporting', 'E_ALL & ~E_NOTICE');
 
+date_default_timezone_set('America/Los_Angeles');
+header("Cache-Control: no-store, no-cache, must-revalidate, max-age=0");
+header("Cache-Control: post-check=0, pre-check=0", false);
+header("Pragma: no-cache");
+
+
 $path = substr($_SERVER['PATH_INFO'], 1);
 $sourceIp = $_SERVER['REMOTE_ADDR'];
 $ip = isset($_GET['ip']) ? $_GET['ip'] : $sourceIp;
@@ -35,6 +41,8 @@ switch($path) {
     case 'check':
         device($ip);
         break;
+    default:
+        echo 'Hello, I am up and running. Thanks for checking.';
 }
 
 function connect() {
@@ -58,12 +66,12 @@ function checkDevice($ip) {
     return $rowCount->fetchColumn() > 0;
 }
 
-// Add device, send in 2 params location and IPv4 address
+// Add device, send in 2 params location and MAC/IPv4 address
 function addDevice($ip, $location) {
     $db = connect();
 
     if(checkDevice($ip)) {
-        echo '{"error": "Device IP is in use"}';
+        echo '{"error": "Device MAC/IP is in use"}';
     } else {
         $deviceSql = "INSERT INTO Devices (
             'Location',
@@ -98,14 +106,14 @@ function getDeviceId($ip) {
 
 function trackTemp($ip, $temp, $humidity) {
     $db = connect();
-
+    $timeStamp = date('o-m-d H:i:s');
     if(!checkDevice($ip)) {
         addDevice($ip, 'Unknown');
     }
     $deviceId = GetDeviceId($ip);
-    $tempSql = "INSERT into Temps (DeviceId, Temperature, Humidity) VALUES (:deviceId, :temp, :humid)";
+    $tempSql = "INSERT into Temps (DeviceId, Temperature, Humidity, Timestamp) VALUES (:deviceId, :temp, :humid, :timeStamp)";
     $insert = $db->prepare($tempSql);
-    if($insert->execute(array($deviceId, $temp, $humidity))) {
+    if($insert->execute(array($deviceId, $temp, $humidity, $timeStamp))) {
         echo '{"status": "uploaded"}';
     } else {
         echo '{"error": "failed to track temp"}';
@@ -117,7 +125,7 @@ function getAllLocations() {
     $devicesSql = "SELECT * FROM 'Devices'";
     $rowCount = $db->query($devicesSql, PDO::FETCH_ASSOC);
     if($rowCount->fetchColumn() > 0) {
-        $times = [];
+        $times = array();
         foreach ($db->query($devicesSql, PDO::FETCH_ASSOC) as $row) {
             $times[] = $row;
         }
@@ -129,10 +137,10 @@ function getAllLocations() {
 
 function getLocationTemps($ip) {
     $db = connect();
-    $tempsSql = "SELECT * FROM Temps WHERE IP = '$ip' ORDER BY Timestamp DESC";
+    $tempsSql = "SELECT * FROM Temps WHERE IP = '$ip' ORDER BY Id DESC";
     $rowCount = $db->query($tempsSql, PDO::FETCH_ASSOC);
     if($rowCount->fetchColumn() > 0) {
-        $temps = [];
+        $temps = array();
         foreach ($db->query($tempsSql, PDO::FETCH_ASSOC) as $row) {
             $temps[] = $row;
         }
@@ -144,10 +152,10 @@ function getLocationTemps($ip) {
 
 function getAllTemps() {
     $db = connect();
-    $tempsSql = "SELECT * FROM Temps ORDER BY Timestamp DESC";
+    $tempsSql = "SELECT * FROM Temps ORDER BY Id DESC";
     $rowCount = $db->query($tempsSql, PDO::FETCH_ASSOC);
     if($rowCount->fetchColumn() > 0) {
-        $temps = [];
+        $temps = array();
         foreach ($db->query($tempsSql, PDO::FETCH_ASSOC) as $row) {
             $temps[] = $row;
         }
