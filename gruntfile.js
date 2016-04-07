@@ -40,14 +40,15 @@ module.exports = function(grunt) {
         },
         copy: {
             main: {
-                src: '<%= project.src %>/index.html',
-                dest: './index.html',
+                expand: true,
+                src: '<%= project.src %>/*.{html,php}',
+                dest: '<%= project.app %>/',
+                flatten: true,
             },
         },
         jshint: {
             all: '<%= project.srcJs %>/{,*/}*.js',
             options: {
-                //ignores: ['<%= project.src_js %>/lib/handlebars.js'],
                 jshintrc: '.jshintrc',
                 reporter: require('jshint-stylish'),
             },
@@ -95,7 +96,7 @@ module.exports = function(grunt) {
                 tasks: ['browserify:dist']
             },
             copy: {
-                files: '<%= project.src %>/index.html',
+                files: '<%= project.src %>/*.{html,php}',
                 tasks: ['copy']
             },
             less: {
@@ -129,7 +130,7 @@ module.exports = function(grunt) {
         },
     });
 
-    require('matchdep').filter('grunt-*').forEach(grunt.loadNpmTasks);
+    require('matchdep').filterAll('grunt-*').forEach(grunt.loadNpmTasks);
 
     grunt.registerTask('js', ['jshint', 'browserify:dist']);
     grunt.registerTask('css', ['less']);

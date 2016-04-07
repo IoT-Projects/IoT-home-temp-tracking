@@ -12,7 +12,7 @@
   "noarg": true,
   "esnext": true,
   "node": true,
-  "predef": ["Request", "Headers", "$"],
+  "predef": ["Request", "Headers", "$", "google"],
   "strict": true,
   "undef": true
 }

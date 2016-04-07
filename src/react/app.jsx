@@ -3,13 +3,14 @@ var React = require('react');
 var Actions = require('../js/lib/actions');
 var Store = require('../js/lib/stores');
 
-var TimeCard = require('./time-card.jsx');
-var Signin = require('./sign-in.jsx');
+var Card = require('./card.jsx');
+var MainContent = require('./main-content.jsx');
 
 module.exports = React.createClass({
     getInitialState:function() {
         return {
-            needsSignin: Store.isSignedIn()
+            locations: [],
+            location: []
         };
     },
     componentDidMount: function() {
@@ -19,14 +20,20 @@ module.exports = React.createClass({
         this.unsubscribe();
     },
     onChange: function() {
-        this.setState({needsSignin: Store.isSignedIn()});
+        this.setState({
+            locations: Store.getLocations()
+        });
     },
     render: function() {
+        var self = this;
         return (
             <div className="container">
-                {
-                    this.state.needsSignin ? <TimeCard/> : <Signin/>
-                }
+                <div className="navWrapper">
+                    {this.state.locations.map(function(location) {
+                        return <Card key={location.Id} data={location}/>;
+                    })}
+                </div>
+                {this.state.location ? <MainContent /> : ''}
             </div>
         );
     }

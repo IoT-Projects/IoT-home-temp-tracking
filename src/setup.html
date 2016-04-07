@@ -87,7 +87,7 @@
             var list = document.querySelector('.js-deviceList');
 
             function getDeviceList() {
-                fetch('./index.php/list/locations').then(function(response) {
+                fetch('./api.php/list/locations').then(function(response) {
                     return response.json();
                 }).then(function(j) {
                     for(var i = 0; i < j.length; i++) {

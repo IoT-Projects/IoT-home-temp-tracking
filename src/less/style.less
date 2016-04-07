@@ -2,72 +2,63 @@
 //@import 'partials/reset';
 
 body {
-  padding-top: 40px;
-  padding-bottom: 40px;
-  background-color: #eee;
+    background: #FAFAFA;
 }
 
-.time-card,
-.form-signin {
-  max-width: 360px;
-  padding: 15px;
-  margin: 0 auto;
+.container {
+    display: flex;
+    justify-content: center;
 }
 
-.time-card {
+.navWrapper {
+    max-width: 360px;
+    min-width: 320px;
     background: #fff;
+    border: 1px solid rgba(0,0,0,0.14);
+    .card {
+        display: block;
+        width: 100%;
+        padding: 10px;
+        color: #455a64;
+        font-weight: 500;
+        border-bottom: 1px solid rgba(0,0,0,0.14);
+        text-decoration: none;
+    }
+    .time {
+        float: right;
+        line-height: 30px;
+    }
+    .title {
+        line-height: 30px;
+        color: #333;
+        font-weight: 700;
+        font-size: 22px;
+        padding-left: 10px;
+    }
+    .locationId {
+        background: #455a64;
+        height: 30px;
+        width: 30px;
+        border-radius: 50%;
+        display: block;
+        text-align: center;
+        line-height: 30px;
+        float: left;
+        color: #fff;
+    }
+    .details {
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        height: 30px;
+        span {
+            flex-grow: 1;
+            text-align: center;
+            align-self: center;
+        }
+    }
 }
 
-.form-signin .form-signin-heading,
-.form-signin .checkbox {
-  margin-bottom: 10px;
-}
-
-.form-signin .checkbox {
-  font-weight: normal;
-}
-
-.form-signin .form-control {
-  position: relative;
-  height: auto;
-  -webkit-box-sizing: border-box;
-     -moz-box-sizing: border-box;
-          box-sizing: border-box;
-  padding: 10px;
-  font-size: 16px;
-}
-
-.form-signin .form-control:focus {
-  z-index: 2;
-}
-
-.form-signin input[type="email"] {
-  margin-bottom: -1px;
-  border-bottom-right-radius: 0;
-  border-bottom-left-radius: 0;
-}
-
-.form-signin input[type="password"] {
-  margin-bottom: 10px;
-  border-top-left-radius: 0;
-  border-top-right-radius: 0;
-}
-
-.total-time {
-    text-align: right;
-}
-
-.signout {
-    padding-left: 10px;
-}
-
-input[type=number] {
-    -webkit-text-security: disc;
-}
-
-.lifeOfPi {
-    position: absolute;
-    bottom: 10px;
-    right: 10px;
-    font-family: 'Times New Roman';
+.mainContent {
+    width: 820px;
 }
